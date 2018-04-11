@@ -1,6 +1,6 @@
 <style lang="less">
-    @import '../../styles/common.less';
-    @import './components/table.less';
+@import '../../styles/common.less';
+@import './components/table.less';
 </style>
 
 <template>
@@ -68,6 +68,35 @@
                 </Card>
             </Col>
         </Row>
+        <Row class="margin-top-10">
+            <Col :span="16" class="height-100">
+                <Card>
+                    <DragableTable refs="table2" type="column" :columns-list="columnsList" v-model="tableData" @on-start="handleOnstart2" @on-end="handleOnend2" @on-choose="handleOnchoose2" ></DragableTable>
+                </Card>
+            </Col>
+            <Col :span="8" class="padding-left-10">
+                <Card>
+                    <p slot="title">
+                        <Icon type="clipboard"></Icon>
+                        表格3操作记录（列拖拽）
+                    </p>
+                    <Row>
+                        <div class="dargging-tip-con">
+                            <transition name="dragging-tip">
+                                <span v-show="table3.hasDragged">拖拽第 {{ table2.oldIndex + 1 }} 列表格到第 {{ table2.newIndex + 1 }} 列</span>
+                            </transition>
+                        </div>
+                        <Card>
+                            <div class="record-tip-con">
+                                <div v-for="(item, index) in table3.chooseRecord" :key="index" class="record-item">
+                                    {{ item }}
+                                </div>
+                            </div>
+                        </Card>
+                    </Row>
+                </Card>
+            </Col>
+        </Row>
     </div>
 </template>
 
@@ -79,7 +108,7 @@ export default {
     components: {
         DragableTable
     },
-    data () {
+    data() {
         return {
             columnsList: [],
             tableData: [],
@@ -96,35 +125,42 @@ export default {
                 oldIndex: 0,
                 newIndex: 0,
                 chooseRecord: []
+            },
+            table3: {
+                hasDragged: false,
+                isDragging: false,
+                oldIndex: 0,
+                newIndex: 0,
+                chooseRecord: []
             }
         };
     },
     methods: {
-        handleOnstart1 (from) {
+        handleOnstart1(from) {
             this.table1.oldIndex = from;
             this.table1.hasDragged = true;
             this.table1.isDragging = true;
         },
-        handleOnend1 (e) {
+        handleOnend1(e) {
             this.table1.isDragging = false;
             this.table1.draggingRecord.unshift({
                 from: e.from + 1,
                 to: e.to + 1
             });
         },
-        handleOnstart2 (from) {
+        handleOnstart2(from) {
             this.table2.oldIndex = from;
             this.table2.hasDragged = true;
             this.table2.isDragging = true;
         },
-        handleOnend2 (e) {
+        handleOnend2(e) {
             this.table2.newIndex = e.to;
             this.table2.isDragging = false;
         },
-        handleOnchoose2 (from) {
+        handleOnchoose2(from) {
             this.table2.chooseRecord.unshift(this.tableData[from].todoItem);
         },
-        getData () {
+        getData() {
             this.columnsList = [
                 {
                     title: '序号',
@@ -145,16 +181,13 @@ export default {
                     key: 'drag',
                     width: 90,
                     align: 'center',
-                    render: (h) => {
-                        return h(
-                            'Icon',
-                            {
-                                props: {
-                                    type: 'arrow-move',
-                                    size: 24
-                                }
+                    render: h => {
+                        return h('Icon', {
+                            props: {
+                                type: 'arrow-move',
+                                size: 24
                             }
-                        );
+                        });
                     }
                 }
             ];
@@ -194,7 +227,7 @@ export default {
             ];
         }
     },
-    created () {
+    created() {
         // 可在此从服务端获取表格数据
         this.getData();
     }
